@@ -1,0 +1,222 @@
+:host {
+  all: initial;
+  color-scheme: light;
+}
+
+.explain-it-popup {
+  width: min(340px, calc(100vw - 24px));
+  max-height: 420px;
+  overflow: hidden;
+  border: 1px solid rgba(16, 32, 39, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 50px rgba(16, 32, 39, 0.24);
+  color: #102027;
+  font: 14px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  animation: explain-it-pop 180ms ease-out;
+  backdrop-filter: blur(18px);
+}
+
+.explain-it-popup__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgb(145, 238, 255), #eefcff);
+}
+
+.explain-it-popup__title {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.explain-it-popup__close {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(16, 32, 39, 0.1);
+  color: #102027;
+  cursor: pointer;
+  font: 20px/1 Arial, sans-serif;
+  transition: transform 150ms ease, background 150ms ease;
+}
+
+.explain-it-popup__close:hover {
+  transform: rotate(90deg) scale(1.04);
+  background: rgba(16, 32, 39, 0.18);
+}
+
+.explain-it-popup__body {
+  max-height: 330px;
+  overflow: auto;
+  padding: 14px;
+  white-space: pre-wrap;
+}
+
+.explain-it-popup__body--loading::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border: 2px solid rgba(16, 32, 39, 0.2);
+  border-top-color: #102027;
+  border-radius: 999px;
+  animation: explain-it-spin 700ms linear infinite;
+  vertical-align: -1px;
+}
+
+.explain-it-popup__body--error {
+  color: #8a1f11;
+}
+
+.explain-it-options-page {
+  min-height: 100vh;
+  margin: 0;
+  background: radial-gradient(circle at top left, rgba(145, 238, 255, 0.42), transparent 34%), #f7fbfc;
+  color: #102027;
+  font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.explain-it-options {
+  width: min(880px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.explain-it-options__hero {
+  margin-bottom: 24px;
+}
+
+.explain-it-options__eyebrow {
+  margin: 0 0 8px;
+  color: #15788a;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.explain-it-options h1 {
+  margin: 0 0 8px;
+  font-size: clamp(32px, 6vw, 56px);
+  line-height: 1;
+}
+
+.explain-it-options__hero p:last-child {
+  max-width: 620px;
+  margin: 0;
+  color: #4a6269;
+}
+
+.explain-it-options__form {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid rgba(16, 32, 39, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 20px 60px rgba(16, 32, 39, 0.08);
+}
+
+.explain-it-field {
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.explain-it-field input,
+.explain-it-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid rgba(16, 32, 39, 0.16);
+  border-radius: 14px;
+  background: #fff;
+  color: #102027;
+  font: inherit;
+  font-weight: 400;
+  padding: 12px 14px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.explain-it-field textarea {
+  resize: vertical;
+}
+
+.explain-it-field input:focus,
+.explain-it-field textarea:focus {
+  border-color: #16a7bd;
+  box-shadow: 0 0 0 4px rgba(145, 238, 255, 0.36);
+  outline: none;
+}
+
+.explain-it-options__hint {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(145, 238, 255, 0.24);
+  color: #24484f;
+}
+
+.explain-it-options__hint code {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 2px 6px;
+}
+
+.explain-it-options__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.explain-it-options__actions button {
+  border: 0;
+  border-radius: 999px;
+  background: #102027;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 12px 18px;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.explain-it-options__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(16, 32, 39, 0.18);
+}
+
+#status {
+  min-height: 24px;
+  margin: 0;
+  color: #157338;
+  font-weight: 700;
+}
+
+#status[data-type="error"] {
+  color: #8a1f11;
+}
+
+@keyframes explain-it-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes explain-it-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

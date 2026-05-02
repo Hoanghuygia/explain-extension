@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Explain It icon">
+  <rect width="128" height="128" rx="28" fill="rgb(145, 238, 255)"/>
+  <path d="M30 36h68a12 12 0 0 1 12 12v32a12 12 0 0 1-12 12H62l-22 18v-18H30a12 12 0 0 1-12-12V48a12 12 0 0 1 12-12Z" fill="#102027" opacity="0.92"/>
+  <path d="M42 56h44M42 72h30" stroke="#91eeff" stroke-width="8" stroke-linecap="round"/>
+</svg>
