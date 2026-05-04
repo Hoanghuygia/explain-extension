@@ -1,7 +1,7 @@
   {
   "manifest_version": 3,
   "name": "Explain It",
-  "version": "0.2.0",
+  "version": "0.2.4",
   "description": "Explain or translate selected text with Gemini.",
   "permissions": ["storage"],
   "host_permissions": ["https://generativelanguage.googleapis.com/*"],
@@ -13,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["vendor/marked.min.js", "vendor/purify.min.js", "content.js"],
+      "js": ["vendor/marked.min.js", "content.js"],
       "run_at": "document_idle"
     }
   ],
@@ -38,5 +38,14 @@
       "96": "icons/icon.svg"
     },
     "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "hoanghuy051230@gmail.com",
+      "data_collection_permissions": {
+      "required": ["none"],
+      "optional": []
+      }
+    }
   }
 }

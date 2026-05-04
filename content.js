@@ -150,21 +150,175 @@ async function showPopup(state, message, rect) {
 }
 
 function renderMarkdown(container, markdown) {
-  if (!globalThis.marked || !globalThis.DOMPurify) {
+  if (!globalThis.marked?.lexer) {
     container.textContent = markdown;
     return;
   }
 
-  const rawHtml = globalThis.marked.parse(markdown || "", {
-    async: false,
-    breaks: true,
-    gfm: true
+  const fragment = document.createDocumentFragment();
+  const tokens = globalThis.marked.lexer(markdown || "", { breaks: true, gfm: true });
+  appendBlockTokens(fragment, tokens);
+  container.append(fragment);
+}
+
+function appendBlockTokens(parent, tokens) {
+  tokens.forEach((token) => {
+    const element = createBlockElement(token);
+    if (element) {
+      parent.append(element);
+    }
   });
-  const safeHtml = globalThis.DOMPurify.sanitize(rawHtml, {
-    USE_PROFILES: { html: true }
+}
+
+function createBlockElement(token) {
+  if (token.type === "space") {
+    return null;
+  }
+
+  if (token.type === "heading") {
+    const depth = Math.min(Math.max(token.depth || 2, 1), 6);
+    const heading = document.createElement(`h${depth}`);
+    appendInlineTokens(heading, token.tokens || [{ type: "text", text: token.text || "" }]);
+    return heading;
+  }
+
+  if (token.type === "paragraph") {
+    const paragraph = document.createElement("p");
+    appendInlineTokens(paragraph, token.tokens || [{ type: "text", text: token.text || "" }]);
+    return paragraph;
+  }
+
+  if (token.type === "text") {
+    const paragraph = document.createElement("p");
+    appendInlineTokens(paragraph, token.tokens || [{ type: "text", text: token.text || "" }]);
+    return paragraph;
+  }
+
+  if (token.type === "list") {
+    const list = document.createElement(token.ordered ? "ol" : "ul");
+    (token.items || []).forEach((item) => {
+      const listItem = document.createElement("li");
+      appendBlockTokens(listItem, item.tokens || [{ type: "text", text: item.text || "" }]);
+      list.append(listItem);
+    });
+    return list;
+  }
+
+  if (token.type === "blockquote") {
+    const blockquote = document.createElement("blockquote");
+    appendBlockTokens(blockquote, token.tokens || [{ type: "text", text: token.text || "" }]);
+    return blockquote;
+  }
+
+  if (token.type === "code") {
+    const pre = document.createElement("pre");
+    const code = document.createElement("code");
+    code.textContent = token.text || "";
+    pre.append(code);
+    return pre;
+  }
+
+  if (token.type === "table") {
+    return createTableElement(token);
+  }
+
+  if (token.type === "hr") {
+    return document.createElement("hr");
+  }
+
+  const paragraph = document.createElement("p");
+  paragraph.textContent = token.text || token.raw || "";
+  return paragraph;
+}
+
+function createTableElement(token) {
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+
+  (token.header || []).forEach((cell) => {
+    const th = document.createElement("th");
+    appendInlineTokens(th, cell.tokens || [{ type: "text", text: cell.text || "" }]);
+    headerRow.append(th);
   });
 
-  container.innerHTML = safeHtml;
+  thead.append(headerRow);
+  table.append(thead);
+
+  const tbody = document.createElement("tbody");
+  (token.rows || []).forEach((row) => {
+    const tableRow = document.createElement("tr");
+    row.forEach((cell) => {
+      const td = document.createElement("td");
+      appendInlineTokens(td, cell.tokens || [{ type: "text", text: cell.text || "" }]);
+      tableRow.append(td);
+    });
+    tbody.append(tableRow);
+  });
+
+  table.append(tbody);
+  return table;
+}
+
+function appendInlineTokens(parent, tokens) {
+  tokens.forEach((token) => {
+    if (token.type === "strong" || token.type === "em" || token.type === "del") {
+      const tagName = token.type === "strong" ? "strong" : token.type;
+      const element = document.createElement(tagName);
+      appendInlineTokens(element, token.tokens || [{ type: "text", text: token.text || "" }]);
+      parent.append(element);
+      return;
+    }
+
+    if (token.type === "codespan") {
+      const code = document.createElement("code");
+      code.textContent = token.text || "";
+      parent.append(code);
+      return;
+    }
+
+    if (token.type === "br") {
+      parent.append(document.createElement("br"));
+      return;
+    }
+
+    if (token.type === "link") {
+      appendLinkToken(parent, token);
+      return;
+    }
+
+    if (token.type === "image") {
+      parent.append(document.createTextNode(token.text || token.href || ""));
+      return;
+    }
+
+    parent.append(document.createTextNode(token.text || token.raw || ""));
+  });
+}
+
+function appendLinkToken(parent, token) {
+  const labelTokens = token.tokens || [{ type: "text", text: token.text || token.href || "" }];
+
+  if (!isSafeLink(token.href)) {
+    appendInlineTokens(parent, labelTokens);
+    return;
+  }
+
+  const link = document.createElement("a");
+  link.href = token.href;
+  link.rel = "noopener noreferrer";
+  link.target = "_blank";
+  appendInlineTokens(link, labelTokens);
+  parent.append(link);
+}
+
+function isSafeLink(href) {
+  try {
+    const url = new URL(href, globalThis.location.href);
+    return url.protocol === "http:" || url.protocol === "https:" || url.protocol === "mailto:";
+  } catch (_error) {
+    return false;
+  }
 }
 
 function sendRuntimeMessage(payload) {
