@@ -12,7 +12,7 @@ Explain It is a lightweight browser extension for explaining or translating sele
 
 ## Configure Gemini
 
-1. Get a Gemini API key from Google AI Studio.
+1. Get a Gemini API key from Google AI Studio: https://aistudio.google.com/api-keys?project=gen-lang-client-0565718630.
 2. Open the Explain It options page.
 3. Paste the key into `Gemini API key`.
 4. Set `Target translation language`, or keep the default `Vietnamese`.

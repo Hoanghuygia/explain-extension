@@ -85,17 +85,29 @@ async function ensurePopup() {
   popup.className = "explain-it-popup";
   popup.setAttribute("role", "dialog");
   popup.setAttribute("aria-live", "polite");
-  popup.innerHTML = `
-    <div class="explain-it-popup__header">
-      <strong class="explain-it-popup__title">Explain It</strong>
-      <button class="explain-it-popup__close" type="button" aria-label="Close Explain It popup">x</button>
-    </div>
-    <div class="explain-it-popup__body"></div>
-  `;
+
+  const header = document.createElement("div");
+  header.className = "explain-it-popup__header";
+
+  const title = document.createElement("strong");
+  title.className = "explain-it-popup__title";
+  title.textContent = "Explain It";
+
+  const closeButton = document.createElement("button");
+  closeButton.className = "explain-it-popup__close";
+  closeButton.type = "button";
+  closeButton.setAttribute("aria-label", "Close Explain It popup");
+  closeButton.textContent = "x";
+
+  const body = document.createElement("div");
+  body.className = "explain-it-popup__body";
+
+  header.append(title, closeButton);
+  popup.append(header, body);
 
   explainItPopupRoot.append(styles, popup);
   document.documentElement.appendChild(explainItPopupHost);
-  explainItPopupRoot.querySelector(".explain-it-popup__close").addEventListener("click", removePopup);
+  closeButton.addEventListener("click", removePopup);
 
   return explainItPopupRoot;
 }
@@ -127,7 +139,32 @@ async function showPopup(state, message, rect) {
 
   const body = root.querySelector(".explain-it-popup__body");
   body.className = `explain-it-popup__body explain-it-popup__body--${state}`;
+  body.textContent = "";
+
+  if (state === "result") {
+    renderMarkdown(body, message);
+    return;
+  }
+
   body.textContent = message;
+}
+
+function renderMarkdown(container, markdown) {
+  if (!globalThis.marked || !globalThis.DOMPurify) {
+    container.textContent = markdown;
+    return;
+  }
+
+  const rawHtml = globalThis.marked.parse(markdown || "", {
+    async: false,
+    breaks: true,
+    gfm: true
+  });
+  const safeHtml = globalThis.DOMPurify.sanitize(rawHtml, {
+    USE_PROFILES: { html: true }
+  });
+
+  container.innerHTML = safeHtml;
 }
 
 function sendRuntimeMessage(payload) {
