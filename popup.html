@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Explain It</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="explain-it-action">
+      <header class="explain-it-action__header">
+        <div>
+          <p class="explain-it-action__eyebrow">Explain It</p>
+          <h1>Explain It</h1>
+        </div>
+        <span class="explain-it-action__badge">AI powered</span>
+      </header>
+
+      <section class="explain-it-card explain-it-status-card" aria-live="polite">
+        <div>
+          <p class="explain-it-label">API key status</p>
+          <strong id="apiStatus" class="explain-it-status explain-it-status--missing">Checking...</strong>
+        </div>
+        <button id="setupButton" class="explain-it-button explain-it-button--primary" type="button">Setup Now</button>
+      </section>
+
+      <section class="explain-it-card explain-it-toggle-card">
+        <div>
+          <p class="explain-it-label">Quick action</p>
+          <strong id="toggleState">Turned on</strong>
+        </div>
+        <label class="explain-it-switch" aria-label="Turn Explain It shortcuts on or off">
+          <input id="enabledToggle" type="checkbox" />
+          <span></span>
+        </label>
+      </section>
+
+      <section class="explain-it-card">
+        <p class="explain-it-label">Shortcut guide</p>
+        <div class="explain-it-shortcut">
+          <kbd>Shift</kbd>
+          <span>Explain (ELI5)</span>
+        </div>
+        <div class="explain-it-shortcut">
+          <kbd>Alt</kbd>
+          <span>Translate</span>
+        </div>
+      </section>
+
+      <button id="settingsButton" class="explain-it-button explain-it-button--ghost" type="button">Settings</button>
+
+      <footer class="explain-it-action__footer">
+        <span>Version <strong id="version">-</strong></span>
+      </footer>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

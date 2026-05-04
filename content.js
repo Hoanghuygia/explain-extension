@@ -15,7 +15,7 @@ function isEditableElement(element) {
   return tagName === "input" || tagName === "textarea" || tagName === "select" || element.isContentEditable;
 }
 
-function nodeHasEditableAncestor(node) {
+function nodeHasEditableAncestor(node) { // Prevent user edit text and mistakely trigger the extension 
   let current = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
 
   while (current) {
@@ -155,6 +155,32 @@ function sendRuntimeMessage(payload) {
   });
 }
 
+function storageGet(defaults) {
+  if (explainItUsesPromiseApi) {
+    return explainItExt.storage.local.get(defaults);
+  }
+
+  return new Promise((resolve, reject) => {
+    try {
+      explainItExt.storage.local.get(defaults, (items) => {
+        const error = explainItExt.runtime.lastError;
+        if (error) {
+          reject(new Error(error.message));
+          return;
+        }
+        resolve(items || defaults);
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+async function isExplainItEnabled() {
+  const config = await storageGet({ enabled: true });
+  return config.enabled !== false;
+}
+
 async function runAction(action, event) {
   const now = Date.now();
   if (now - explainItLastTrigger < EXPLAIN_IT_KEY_THROTTLE_MS) {
@@ -162,7 +188,11 @@ async function runAction(action, event) {
   }
   explainItLastTrigger = now;
 
-  if (explainItRequestInFlight) {
+  if (!(await isExplainItEnabled())) {
+    return;
+  }
+
+  if (explainItRequestInFlight) { // flag to prevent multiple AI request running
     return;
   }
 

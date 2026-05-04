@@ -2,12 +2,12 @@ const ext = globalThis.browser || globalThis.chrome;
 const usesPromiseApi = typeof globalThis.browser !== "undefined";
 
 const DEFAULT_TARGET_LANGUAGE = "Vietnamese";
-const GEMINI_MODEL = "gemini-1.5-flash";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const DEFAULT_GEMINI_MODEL = "models/gemini-3.1-flash-lite-preview";
+const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
 
 const DEFAULT_PROMPTS = {
-  explain: `Explain the following text in Vietnamese like I am 5 years old.
-Keep it simple, short, and easy to understand.
+  explain: `Explain the following text in {{targetLanguage}} in a simple, clear, and easy-to-understand way.
+Use a friendly but mature tone. Keep it concise and practical.
 Text: "{{text}}"`,
   translate: `Translate the following text into {{targetLanguage}}.
 Also include:
@@ -46,6 +46,7 @@ function storageGet(defaults) {
 async function loadConfig() {
   return storageGet({
     geminiApiKey: "",
+    geminiModel: DEFAULT_GEMINI_MODEL,
     targetLanguage: DEFAULT_TARGET_LANGUAGE,
     customEli5Prompt: "",
     customTranslationPrompt: ""
@@ -78,8 +79,14 @@ function extractGeminiText(data) {
   return parts.map((part) => part.text || "").join("\n").trim();
 }
 
-async function callGemini(apiKey, prompt) {
-  const response = await fetch(GEMINI_ENDPOINT, {
+function normalizeGeminiModel(model) {
+  const trimmedModel = (model || DEFAULT_GEMINI_MODEL).trim() || DEFAULT_GEMINI_MODEL;
+  return trimmedModel.startsWith("models/") ? trimmedModel : `models/${trimmedModel}`;
+}
+
+async function callGemini(apiKey, model, prompt) {
+  const geminiModel = normalizeGeminiModel(model);
+  const response = await fetch(`${GEMINI_API_BASE}/${geminiModel}:generateContent`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -123,13 +130,14 @@ async function handleAction(message) {
 
   const config = await loadConfig();
   const apiKey = (config.geminiApiKey || "").trim();
+  const model = config.geminiModel || DEFAULT_GEMINI_MODEL;
 
   if (!apiKey) {
     throw new Error("Missing Gemini API key. Open the Explain It options page to add one.");
   }
 
   const prompt = buildPrompt(action, config, text);
-  const result = await callGemini(apiKey, prompt);
+  const result = await callGemini(apiKey, model, prompt);
 
   return { ok: true, result };
 }

@@ -21,6 +21,18 @@
         </label>
 
         <label class="explain-it-field">
+          <span>Gemini model</span>
+          <select id="geminiModel">
+            <option value="">Enter an API key to load supported models</option>
+          </select>
+        </label>
+
+        <div class="explain-it-options__model-actions">
+          <button id="loadModels" type="button">Load Models</button>
+          <p id="modelStatus" role="status" aria-live="polite"></p>
+        </div>
+
+        <label class="explain-it-field">
           <span>Target translation language</span>
           <input id="targetLanguage" type="text" placeholder="Vietnamese" />
         </label>
