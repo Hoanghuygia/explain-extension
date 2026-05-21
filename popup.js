@@ -89,11 +89,18 @@ function setToggleState(enabled) {
 
 async function loadPopupState() {
   const config = await storageGet({
+    provider: "gemini",
     geminiApiKey: "",
     enabled: true
   });
 
-  setApiStatus(Boolean((config.geminiApiKey || "").trim()));
+  const provider = config.provider || "gemini";
+  if (provider === "ollama") {
+    setApiStatus(true);
+  } else {
+    setApiStatus(Boolean((config.geminiApiKey || "").trim()));
+  }
+
   setToggleState(config.enabled !== false);
 }
 
