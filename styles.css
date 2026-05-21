@@ -223,6 +223,10 @@
   font-weight: 700;
 }
 
+.explain-it-field.is-hidden {
+  display: none;
+}
+
 .explain-it-field input,
 .explain-it-field select,
 .explain-it-field textarea {
