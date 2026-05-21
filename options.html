@@ -18,12 +18,33 @@
 
       <form id="explain-it-options-form" class="explain-it-options__form">
         <label class="explain-it-field">
-          <span>Gemini API key</span>
+          <span>Provider</span>
+          <select id="provider">
+            <option value="gemini">Gemini</option>
+            <option value="ollama">Ollama (Local)</option>
+          </select>
+        </label>
+
+        <label class="explain-it-field" id="ollamaBaseUrlField">
+          <span>Ollama base URL</span>
+          <input id="ollamaBaseUrl" type="url" placeholder="http://localhost:11434" />
+        </label>
+
+        <label class="explain-it-field" id="geminiApiKeyField">
+          <span class="explain-it-field__label">
+            <span>Gemini API key</span>
+            <a
+              class="explain-it-field__help-link"
+              href="https://aistudio.google.com/api-keys"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Get API key</a>
+          </span>
           <input id="geminiApiKey" type="password" autocomplete="off" placeholder="Paste your Gemini API key" />
         </label>
 
         <label class="explain-it-field">
-          <span>Gemini model</span>
+          <span>Model</span>
           <select id="geminiModel">
             <option value="">Enter an API key to load supported models</option>
           </select>
