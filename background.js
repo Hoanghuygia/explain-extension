@@ -5,6 +5,10 @@ const DEFAULT_TARGET_LANGUAGE = "Vietnamese";
 const DEFAULT_GEMINI_MODEL = "models/gemini-3.1-flash-lite-preview";
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
 
+const DEFAULT_PROVIDER = "gemini";
+const DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434";
+const DEFAULT_OLLAMA_MODEL = "llama3.2:3b";
+
 const DEFAULT_PROMPTS = {
   explain: `Explain the following text in {{targetLanguage}} in a simple, clear, and easy-to-understand way.
 Use a friendly but mature tone. Keep it concise and practical.
@@ -45,8 +49,11 @@ function storageGet(defaults) {
 
 async function loadConfig() {
   return storageGet({
+    provider: DEFAULT_PROVIDER,
     geminiApiKey: "",
     geminiModel: DEFAULT_GEMINI_MODEL,
+    ollamaBaseUrl: DEFAULT_OLLAMA_BASE_URL,
+    ollamaModel: DEFAULT_OLLAMA_MODEL,
     targetLanguage: DEFAULT_TARGET_LANGUAGE,
     customEli5Prompt: "",
     customTranslationPrompt: ""
@@ -116,6 +123,46 @@ async function callGemini(apiKey, model, prompt) {
   return text;
 }
 
+async function callOllama(baseUrl, model, prompt) {
+  const response = await fetch(new URL("/api/chat", baseUrl).toString(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model,
+      stream: false,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = data?.error || "Ollama request failed. Please try again.";
+    throw new Error(message);
+  }
+
+  const text = data?.message?.content?.trim();
+  if (!text) {
+    throw new Error("Ollama returned an empty response. Please try again.");
+  }
+
+  return text;
+}
+
+async function callProvider(provider, config, prompt) {
+  if (provider === "ollama") {
+    const baseUrl = (config.ollamaBaseUrl || DEFAULT_OLLAMA_BASE_URL).trim() || DEFAULT_OLLAMA_BASE_URL;
+    const model = (config.ollamaModel || DEFAULT_OLLAMA_MODEL).trim() || DEFAULT_OLLAMA_MODEL;
+    return callOllama(baseUrl, model, prompt);
+  }
+
+  const apiKey = (config.geminiApiKey || "").trim();
+  const model = config.geminiModel || DEFAULT_GEMINI_MODEL;
+  if (!apiKey) {
+    throw new Error("Missing Gemini API key. Open the Explain It options page to add one.");
+  }
+  return callGemini(apiKey, model, prompt);
+}
+
 async function handleAction(message) {
   const action = message?.action;
   const text = (message?.text || "").trim();
@@ -129,15 +176,9 @@ async function handleAction(message) {
   }
 
   const config = await loadConfig();
-  const apiKey = (config.geminiApiKey || "").trim();
-  const model = config.geminiModel || DEFAULT_GEMINI_MODEL;
-
-  if (!apiKey) {
-    throw new Error("Missing Gemini API key. Open the Explain It options page to add one.");
-  }
-
+  const provider = config.provider || DEFAULT_PROVIDER;
   const prompt = buildPrompt(action, config, text);
-  const result = await callGemini(apiKey, model, prompt);
+  const result = await callProvider(provider, config, prompt);
 
   return { ok: true, result };
 }
