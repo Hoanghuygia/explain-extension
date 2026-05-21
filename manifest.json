@@ -1,7 +1,7 @@
   {
   "manifest_version": 3,
   "name": "Explain It",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Explain or translate selected text with Gemini.",
   "permissions": ["storage"],
   "host_permissions": [

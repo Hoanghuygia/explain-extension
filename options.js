@@ -272,10 +272,15 @@ async function testProviderModel(provider, model) {
   await testOllamaModel(baseUrl, model);
 }
 
-function applyProviderUI(provider) {
-  const needsKey = providerRequiresApiKey(provider);
-  fields.geminiApiKeyField.classList.toggle("is-hidden", !needsKey);
-  fields.ollamaBaseUrlField.classList.toggle("is-hidden", provider !== "ollama");
+function updateProviderFields(provider) {
+  const isGemini = provider === "gemini";
+  const isOllama = provider === "ollama";
+  document.querySelectorAll(".provider-gemini-only").forEach((el) => {
+    el.classList.toggle("is-hidden", !isGemini);
+  });
+  document.querySelectorAll(".provider-ollama-only").forEach((el) => {
+    el.classList.toggle("is-hidden", !isOllama);
+  });
 }
 
 async function loadOptions() {
@@ -304,12 +309,18 @@ async function loadOptions() {
   fields.customEli5Prompt.value = config.customEli5Prompt || "";
   fields.customTranslationPrompt.value = config.customTranslationPrompt || "";
 
-  applyProviderUI(provider);
+  updateProviderFields(provider);
+
+  fields.geminiApiKey.readOnly = true;
 
   if (provider === "gemini" && (config.geminiApiKey || "").trim()) {
     await loadModelsForProvider(provider);
   }
 }
+
+fields.geminiApiKey.addEventListener("focus", () => {
+  fields.geminiApiKey.readOnly = false;
+});
 
 loadModelsButton.addEventListener("click", () => {
   void loadModelsForProvider(getSelectedProvider());
@@ -323,7 +334,7 @@ fields.geminiApiKey.addEventListener("change", () => {
 
 fields.provider.addEventListener("change", async () => {
   const provider = getSelectedProvider();
-  applyProviderUI(provider);
+  updateProviderFields(provider);
   await loadModelsForProvider(provider);
 });
 
@@ -364,6 +375,7 @@ form.addEventListener("submit", async (event) => {
     fields.targetLanguage.value = targetLanguage;
     fields.customEli5Prompt.value = fields.customEli5Prompt.value.trim();
     fields.customTranslationPrompt.value = fields.customTranslationPrompt.value.trim();
+    fields.geminiApiKey.readOnly = true;
     setStatus("Options saved.");
   } catch (error) {
     setStatus(error.message || "Could not save options.", "error");
