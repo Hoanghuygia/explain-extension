@@ -1,25 +1,30 @@
 # Explain It
 
-Explain It is a lightweight browser extension for explaining or translating selected text on any website with Gemini.
+Explain It is a lightweight browser extension for explaining or translating selected text on any website using Gemini or a local Ollama model.
 
 ## Features
 
 - Select text and press `Shift` for a short Vietnamese ELI5 explanation.
 - Select text and press `Alt` for translation into your configured target language.
-- Configure your Gemini API key locally in the extension options page.
+- Supports both **Gemini** (cloud API key) and **Ollama** (local model) providers.
+- Configure your provider and API key locally in the extension options page.
+- Load available models for the selected provider with one click.
 - Customize the ELI5 and translation prompts with template variables.
 - Firefox-first WebExtension with Chrome fallback support through Manifest V3.
 
-## Configure Gemini
+## Configuration
 
-1. Get a Gemini API key from Google AI Studio: https://aistudio.google.com/api-keys.
-2. Open the Explain It options page.
-3. Paste the key into `Gemini API key`.
-4. Set `Target translation language`, or keep the default `Vietnamese`.
-5. Optionally customize the prompt textareas.
-6. Click `Save Options`.
+1. Open the Explain It options page.
+2. Choose your provider: **Gemini** or **Ollama (Local)**.
+3. Fill in the fields for your chosen provider:
+   - **Gemini**: paste your API key from Google AI Studio, then click "Load Models".
+   - **Ollama**: set the base URL (defaults to `http://localhost:11434`), then click "Load Models".
+4. Select a model from the loaded list.
+5. Set the target translation language, or keep the default `Vietnamese`.
+6. Optionally customize the prompt textareas.
+7. Click `Save Options`.
 
-The API key is stored in extension local storage. It is not hard-coded in the source.
+Secrets (API keys) are stored in extension local storage, not hard-coded in the source.
 
 ## Custom Prompts
 
@@ -42,7 +47,7 @@ If a custom prompt is empty, Explain It uses the built-in default prompt. If a c
 3. Click `This Firefox`.
 4. Click `Load Temporary Add-on...`.
 5. Select this project's `manifest.json` file.
-6. Open the extension options page and configure your Gemini API key.
+6. Open the extension options page and configure your provider (Gemini or Ollama).
 
 Temporary add-ons are removed when Firefox restarts.
 
@@ -53,7 +58,7 @@ Temporary add-ons are removed when Firefox restarts.
 3. Enable `Developer mode`.
 4. Click `Load unpacked`.
 5. Select this project folder.
-6. Open the extension options page and configure your Gemini API key.
+6. Open the extension options page and configure your provider (Gemini or Ollama).
 
 ## Usage
 
@@ -65,7 +70,7 @@ Temporary add-ons are removed when Firefox restarts.
 
 Explain It does not trigger when there is no selected text or when you are typing in an input, textarea, select, or contenteditable area.
 
-Selections are limited to 4000 characters to avoid unexpectedly large Gemini requests. If the Gemini API key is missing, the popup shows an error asking you to configure it in the options page.
+Selections are limited to 4000 characters to avoid unexpectedly large requests. If the provider is not configured, the popup shows an error asking you to configure it in the options page.
 
 ## Packaging For Firefox Add-ons Later
 
@@ -76,6 +81,4 @@ For a future Firefox Add-ons submission:
 3. Zip the extension files from the project root, excluding `.git` and development-only files.
 4. Submit the zip through the Firefox Add-ons developer hub.
 
-## ChatGPT Fallback
 
-The first version implements Gemini only. ChatGPT fallback support can be added later by introducing provider settings in the options page and a provider-specific request function in `background.js`.
