@@ -26,6 +26,8 @@ const fields = {
   customTranslationPrompt: document.querySelector("#customTranslationPrompt")
 };
 
+let lastLoadedConfig = null;
+
 function storageGet(defaults) {
   if (optionsUsesPromiseApi) {
     return optionsExt.storage.local.get(defaults);
@@ -288,15 +290,20 @@ async function loadOptions() {
     customTranslationPrompt: ""
   });
 
+  lastLoadedConfig = config;
+
   fields.provider.value = config.provider || DEFAULT_PROVIDER;
   fields.geminiApiKey.value = config.geminiApiKey || "";
-  showSavedModelOption(config.geminiModel || DEFAULT_GEMINI_MODEL);
+  const provider = getSelectedProvider();
+  const savedModel = provider === "ollama"
+    ? config.ollamaModel || DEFAULT_OLLAMA_MODEL
+    : config.geminiModel || DEFAULT_GEMINI_MODEL;
+  showSavedModelOption(savedModel);
   fields.ollamaBaseUrl.value = config.ollamaBaseUrl || DEFAULT_OLLAMA_BASE_URL;
   fields.targetLanguage.value = config.targetLanguage || DEFAULT_TARGET_LANGUAGE;
   fields.customEli5Prompt.value = config.customEli5Prompt || "";
   fields.customTranslationPrompt.value = config.customTranslationPrompt || "";
 
-  const provider = getSelectedProvider();
   applyProviderUI(provider);
 
   if (provider === "gemini" && (config.geminiApiKey || "").trim()) {
@@ -332,8 +339,14 @@ form.addEventListener("submit", async (event) => {
 
   const targetLanguage = fields.targetLanguage.value.trim() || DEFAULT_TARGET_LANGUAGE;
   const provider = getSelectedProvider();
-  const geminiModel = fields.geminiModel.value || DEFAULT_GEMINI_MODEL;
-  const ollamaModel = fields.geminiModel.value || DEFAULT_OLLAMA_MODEL;
+  const selectedModel = fields.geminiModel.value.trim();
+  const fallbackConfig = lastLoadedConfig || {};
+  const geminiModel = provider === "gemini"
+    ? (selectedModel || DEFAULT_GEMINI_MODEL)
+    : (fallbackConfig.geminiModel || DEFAULT_GEMINI_MODEL);
+  const ollamaModel = provider === "ollama"
+    ? (selectedModel || DEFAULT_OLLAMA_MODEL)
+    : (fallbackConfig.ollamaModel || DEFAULT_OLLAMA_MODEL);
 
   try {
     await storageSet({
